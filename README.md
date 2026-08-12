@@ -1,10 +1,25 @@
+
 # 🚀 AWS Serverless Event Tracker
 
-Un'applicazione web serverless full-stack realizzata su AWS che traccia le visite al sito in tempo reale. Questo progetto dimostra un'architettura cloud event-driven, l'integrazione di API e la persistenza dei dati su un database NoSQL.
+## 📌 Descrizione del Progetto
+
+Progetto pratico focalizzato sulla progettazione e implementazione di un'architettura web **Serverless, scalable e event-driven** su Amazon Web Services (AWS) per il tracciamento delle visite in tempo reale.
+
+Invece di utilizzare un server sempre attivo (come EC2), l'infrastruttura sfrutta un approccio **100% Serverless**: un frontend statico ospitato su **Amazon S3** invia richieste asincrone tramite **Amazon API Gateway**, scatenando l'esecuzione di una funzione **AWS Lambda** che gestisce la logica di backend e salva i record su **Amazon DynamoDB**.
 
 ---
 
-## 🏗️ Schema dell'Architettura
+## 🏗️ Architettura e Componenti
+
+- **Amazon S3 (Static Website Hosting)**: Punto di ingresso del frontend. Ospita i file statici (`index.html`) rendendoli accessibili via web grazie a una Bucket Policy di lettura pubblica.
+- **Amazon API Gateway (HTTP API)**: Gestisce l'endpoint HTTP (`/visit`), la configurazione dei permessi CORS (Cross-Origin Resource Sharing) e smista il traffico in entrata verso la funzione Lambda.
+- **AWS Lambda**: Componente di calcolo serverless event-driven. Riceve la richiesta da API Gateway, genera un ID univoco con timestamp ed esegue la scrittura sul database NoSQL.
+- **Amazon DynamoDB**: Database NoSQL fully-managed a chiavi-valore. Memorizza in modo persistente i dati delle visite ricevuti da Lambda con scalabilità automatica.
+- **AWS IAM (Identity and Access Management)**: Ruolo di esecuzione dedicato applicato a Lambda per consentire la sola scrittura (`dynamodb:PutItem`) sulla tabella, garantendo il principio del minimo privilegio.
+
+---
+
+## 📐 Schema dell'Architettura
 
 ```mermaid
 flowchart LR
@@ -18,31 +33,45 @@ flowchart LR
     
     User .->|Carica l'interfaccia| S3
 ```
-🛠️ Servizi AWS e Stack Tecnologico
-Amazon S3: Ospita il frontend statico (index.html) configurato con Bucket Policy di lettura pubblica.
+📷 Evidenze di Configurazione
+1. Interfaccia Web Static Hosting (S3)
+(Aggiungi qui lo screenshot della tua pagina web aperta nel browser)
 
-Amazon API Gateway: HTTP API per la gestione delle rotte e della configurazione CORS.
+2. Rotta e Integrazione API Gateway
+(Aggiungi qui lo screenshot della console di API Gateway con la rotta /visit)
 
-AWS Lambda: Funzione serverless (Node.js/Python) per l'esecuzione della logica di backend.
+3. Record Salvati su Tabella DynamoDB
+(Aggiungi qui lo screenshot degli items salvati su DynamoDB)
 
-Amazon DynamoDB: Database NoSQL Key-Value per il salvataggio dei log delle visite con timestamp univoci.
+📜 Codice di Backend (AWS Lambda - Node.js)
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 
-AWS IAM: Ruoli di esecuzione configurati secondo il principio del minimo privilegio.
+const client = new DynamoDBClient({});
+const docClient = DynamoDBDocumentClient.from(client);
 
-📸 Screenshot e Dimostrazione
-1. Interfaccia Frontend (Ospitata su S3)
-(Aggiungi qui la foto del sito web caricato su S3)
+export const handler = async (event) => {
+    const visitId = Date.now().toString();
+    
+    const params = {
+        TableName: "VisitsTable",
+        Item: {
+            VisitID: visitId,
+            Timestamp: new Date().toISOString()
+        }
+    };
 
-2. Record della Tabella DynamoDB
-(Aggiungi qui lo screenshot di DynamoDB con i dati salvati)
-
-🔄 Flusso di Esecuzione
-L'utente apre l'applicazione web statica ospitata su Amazon S3.
-
-Cliccando sul pulsante "Registra Visita", il browser invia una richiesta asincrona POST ad API Gateway.
-
-API Gateway valida la richiesta, gestisce gli header CORS e invoca la funzione AWS Lambda.
-
-AWS Lambda elabora l'evento, genera il payload con ID univoco e lo scrive direttamente su Amazon DynamoDB.
-
-Il frontend riceve la risposta di conferma e aggiorna l'interfaccia in tempo reale.
+    try {
+        await docClient.send(new PutCommand(params));
+        return {
+            statusCode: 200,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: "Visita registrata con successo!", visitId }),
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: error.message }),
+        };
+    }
+};
