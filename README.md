@@ -20,7 +20,7 @@ Invece di utilizzare un server sempre attivo (come EC2), l'infrastruttura sfrutt
 
 ## 📐 Schema dell'Architettura
 
-```mermaid
+<pre class="mermaid">
 flowchart LR
     User[💻 Utente / Browser] -->|1. Richiesta HTTP POST| Gateway[🌐 Amazon API Gateway]
     Gateway -->|2. Invoca l'evento| Lambda[⚡ AWS Lambda]
@@ -31,48 +31,20 @@ flowchart LR
     end
     
     User .->|Carica l'interfaccia| S3
-```
-📷 Evidenze di Configurazione
-1. Interfaccia Web Static Hosting (S3)
-(Aggiungi qui lo screenshot della tua pagina web aperta nel browser)
-
-2. Rotta e Integrazione API Gateway
-(Aggiungi qui lo screenshot della console di API Gateway con la rotta /visit)
-
-3. Record Salvati su Tabella DynamoDB
-(Aggiungi qui lo screenshot degli items salvati su DynamoDB)
+</pre>
 
 ---
 
-📜 Codice di Backend (AWS Lambda - Node.js)
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+## 📷 Evidenze di Configurazione
 
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
+### 1. Interfaccia Web Static Hosting (S3)
+*(Aggiungi qui lo screenshot della tua pagina web aperta nel browser)*  
+![Frontend S3](INSERISCI_NOME_FILE_SCREENSHOT_FRONTEND)
 
-export const handler = async (event) => {
-    const visitId = Date.now().toString();
-    
-    const params = {
-        TableName: "NOME_DELLA_TUA_TABELLA_DYNAMODB",
-        Item: {
-            VisitID: visitId,
-            Timestamp: new Date().toISOString()
-        }
-    };
+### 2. Rotta e Integrazione API Gateway
+*(Aggiungi qui lo screenshot della console di API Gateway con la rotta /visit)*  
+![API Gateway](INSERISCI_NOME_FILE_SCREENSHOT_APIGATEWAY)
 
-    try {
-        await docClient.send(new PutCommand(params));
-        return {
-            statusCode: 200,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: "Visita registrata con successo!", visitId }),
-        };
-    } catch (error) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: error.message }),
-        };
-    }
-};
+### 3. Record Salvati su Tabella DynamoDB
+*(Aggiungi qui lo screenshot degli items salvati su DynamoDB)*  
+![DynamoDB Items](INSERISCI_NOME_FILE_SCREENSHOT_DYNAMODB)
