@@ -1,4 +1,3 @@
-
 # 🚀 AWS Serverless Event Tracker
 
 ## 📌 Descrizione del Progetto
@@ -43,6 +42,8 @@ flowchart LR
 3. Record Salvati su Tabella DynamoDB
 (Aggiungi qui lo screenshot degli items salvati su DynamoDB)
 
+---
+
 📜 Codice di Backend (AWS Lambda - Node.js)
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
@@ -54,7 +55,7 @@ export const handler = async (event) => {
     const visitId = Date.now().toString();
     
     const params = {
-        TableName: "VisitsTable",
+        TableName: "NOME_DELLA_TUA_TABELLA_DYNAMODB",
         Item: {
             VisitID: visitId,
             Timestamp: new Date().toISOString()
