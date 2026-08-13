@@ -63,7 +63,7 @@ export const handler = async (event) => {
     const visitId = Date.now().toString();
     
     const params = {
-        TableName: "NOME_TUA_TABELLA",
+        TableName: "UserVisits",
         Item: {
             VisitID: visitId,
             Timestamp: new Date().toISOString()
