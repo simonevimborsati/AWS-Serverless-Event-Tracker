@@ -37,16 +37,16 @@ flowchart LR
 ## 📷 Evidenze di Configurazione
 
 ### 1. Interfaccia Web Static Hosting (S3)
-*(Aggiungi qui lo screenshot della tua pagina web aperta nel browser)*  
-![Frontend S3](INSERISCI_NOME_FILE_SCREENSHOT_FRONTEND)
+
+<img width="1750" height="599" alt="Screenshot 2026-08-13 111057" src="https://github.com/user-attachments/assets/5bcee8da-bf8d-4294-b141-9c84670733a4" />
 
 ### 2. Rotta e Integrazione API Gateway
-*(Aggiungi qui lo screenshot della console di API Gateway con la rotta /visit)*  
-![API Gateway](INSERISCI_NOME_FILE_SCREENSHOT_APIGATEWAY)
+
+<img width="1616" height="733" alt="Screenshot 2026-08-13 111518" src="https://github.com/user-attachments/assets/a2e6c918-cda9-49a9-9546-7de209ec70ea" />
 
 ### 3. Record Salvati su Tabella DynamoDB
-*(Aggiungi qui lo screenshot degli items salvati su DynamoDB)*  
-![DynamoDB Items](INSERISCI_NOME_FILE_SCREENSHOT_DYNAMODB)
+
+<img width="1606" height="782" alt="Screenshot 2026-08-13 111923" src="https://github.com/user-attachments/assets/c72b21da-db5c-423b-a394-32870d79891c" />
 
 ---
 
