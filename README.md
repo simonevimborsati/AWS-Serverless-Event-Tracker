@@ -48,3 +48,41 @@ flowchart LR
 ### 3. Record Salvati su Tabella DynamoDB
 *(Aggiungi qui lo screenshot degli items salvati su DynamoDB)*  
 ![DynamoDB Items](INSERISCI_NOME_FILE_SCREENSHOT_DYNAMODB)
+
+---
+
+## 📜 Codice di Backend (AWS Lambda)
+
+<pre><code>
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+
+const client = new DynamoDBClient({});
+const docClient = DynamoDBDocumentClient.from(client);
+
+export const handler = async (event) => {
+    const visitId = Date.now().toString();
+    
+    const params = {
+        TableName: "NOME_TUA_TABELLA",
+        Item: {
+            VisitID: visitId,
+            Timestamp: new Date().toISOString()
+        }
+    };
+
+    try {
+        await docClient.send(new PutCommand(params));
+        return {
+            statusCode: 200,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: "Visita registrata con successo!", visitId }),
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: error.message }),
+        };
+    }
+};
+</code></pre>
