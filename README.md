@@ -52,7 +52,8 @@ flowchart LR
 
 ## 📜 Codice di Backend (AWS Lambda)
 
-```import json
+```
+import json
 import boto3
 import uuid
 from datetime import datetime
