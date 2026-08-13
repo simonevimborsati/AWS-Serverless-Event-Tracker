@@ -20,7 +20,7 @@ Invece di utilizzare un server sempre attivo (come EC2), l'infrastruttura sfrutt
 
 ## 📐 Schema dell'Architettura
 
-<pre class="mermaid">
+```mermaid
 flowchart LR
     User[💻 Utente / Browser] -->|1. Richiesta HTTP POST| Gateway[🌐 Amazon API Gateway]
     Gateway -->|2. Invoca l'evento| Lambda[⚡ AWS Lambda]
@@ -31,8 +31,7 @@ flowchart LR
     end
     
     User .->|Carica l'interfaccia| S3
-</pre>
-
+```
 ---
 
 ## 📷 Evidenze di Configurazione
