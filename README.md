@@ -52,36 +52,53 @@ flowchart LR
 
 ## 📜 Codice di Backend (AWS Lambda)
 
-<pre><code>
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import json
+import boto3
+import uuid
+from datetime import datetime
 
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
+# Inizializziamo il client DynamoDB
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('UserVisits')
 
-export const handler = async (event) => {
-    const visitId = Date.now().toString();
-    
-    const params = {
-        TableName: "UserVisits",
-        Item: {
-            VisitID: visitId,
-            Timestamp: new Date().toISOString()
+def lambda_handler(event, context):
+    try:
+        # 1. Generiamo un ID univoco e la data/ora corrente
+        visit_id = str(uuid.uuid4())
+        timestamp = datetime.now().isoformat()
+        
+        # 2. Estraiamo l'User-Agent dalle intestazioni HTTP se presente
+        headers = event.get('headers', {}) or {}
+        user_agent = headers.get('user-agent', 'Sconosciuto')
+        
+        # 3. Salva l'elemento nella tabella DynamoDB
+        table.put_item(
+            Item={
+                'id': visit_id,
+                'timestamp': timestamp,
+                'user_agent': user_agent
+            }
+        )
+        
+        # 4. Risposta HTTP da restituire ad API Gateway
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'  # Abilita CORS
+            },
+            'body': json.dumps({
+                'message': 'Visita registrata con successo!',
+                'id': visit_id,
+                'timestamp': timestamp
+            })
         }
-    };
-
-    try {
-        await docClient.send(new PutCommand(params));
+    except Exception as e:
         return {
-            statusCode: 200,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: "Visita registrata con successo!", visitId }),
-        };
-    } catch (error) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: error.message }),
-        };
-    }
-};
-</code></pre>
+            'statusCode': 500,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({'error': str(e)})
+        }
